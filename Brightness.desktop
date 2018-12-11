@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Brightness
+Exec=/usr/bin/brightness
+Icon=brightness
+Type=Application
+Categories=Utility;Settings;DesktopSettings;
