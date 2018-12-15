@@ -22,12 +22,12 @@ cp backlight $RPM_BUILD_ROOT/usr/bin
 install -d $RPM_BUILD_ROOT/usr/share/applications
 cp Brightness.desktop $RPM_BUILD_ROOT/usr/share/applications
 
-install -d $RPM_BUILD_ROOT/etc/etc/udev/rules.d
-cp 80-backlight.rules $RPM_BUILD_ROOT/etc/etc/udev/rules.d
+install -d $RPM_BUILD_ROOT/etc/udev/rules.d
+cp 80-backlight.rules $RPM_BUILD_ROOT/etc/udev/rules.d
 
 
 %files
-%attr(644,root,root) /etc/etc/udev/rules.d/80-backlight.rules
+%attr(644,root,root) /etc/udev/rules.d/80-backlight.rules
 %attr(755,root,root) /usr/share/applications/Brightness.desktop
 %attr(755,root,root) /usr/bin/backlight
 

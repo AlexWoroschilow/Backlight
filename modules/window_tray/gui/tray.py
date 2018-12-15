@@ -17,6 +17,7 @@ from PyQt5 import QtGui
 
 from .menu import BacklightDeviceAction
 from .menu import AmbientlightDeviceAction
+from .menu import MenuSettingsAction
 
 
 class DictionaryTray(QtWidgets.QSystemTrayIcon):
@@ -24,6 +25,8 @@ class DictionaryTray(QtWidgets.QSystemTrayIcon):
     ambientlights = []
     
     pause = QtCore.pyqtSignal(int)
+    threshold = QtCore.pyqtSignal(int)
+
     quit = QtCore.pyqtSignal()
     
     @inject.params(backlight='backlight', ambientlight='ambientlight')
@@ -32,13 +35,12 @@ class DictionaryTray(QtWidgets.QSystemTrayIcon):
         self.activated.connect(self.onActionClick)
 
         self.menu = QtWidgets.QMenu()
-
-        pause = QtWidgets.QAction('Adjust brightness', self.menu)
-        pause.triggered.connect(lambda x: self.pause.emit(x))        
-        pause.setCheckable(True)
-        pause.setChecked(True)
-        self.menu.addAction(pause)
         
+        self.settings = MenuSettingsAction(self)
+        self.settings.pause.connect(lambda x: self.pause.emit(x))
+        self.settings.threshold.connect(self.onActionThreshold)
+        self.menu.addAction(self.settings)
+
         self.menu.addSeparator()
 
         for device in ambientlight.devices:
@@ -70,3 +72,6 @@ class DictionaryTray(QtWidgets.QSystemTrayIcon):
         if value == self.Trigger:  # left click!
             self.menu.exec_(QtGui.QCursor.pos())
 
+    @inject.params(config='config')
+    def onActionThreshold(self, threshold, config):
+        config.set('brightness.threshold', '{}'.format(threshold))

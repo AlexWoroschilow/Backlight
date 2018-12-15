@@ -10,10 +10,41 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+import math
+
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from .thread import TimeIntervalThread
+from .radio import RadioButtonGroup 
+
+
+class MenuSettingsAction(QtWidgets.QWidgetAction):
+
+    pause = QtCore.pyqtSignal(int)
+    threshold = QtCore.pyqtSignal(int)
+
+    @inject.params(config='config')
+    def __init__(self, parent, config):
+        super(MenuSettingsAction, self).__init__(parent)
+        
+        layout = QtWidgets.QVBoxLayout()
+
+        self.toggle = QtWidgets.QCheckBox('Enabled')
+        self.toggle.setChecked(bool(config.get('brightness.pause')))
+        self.toggle.stateChanged.connect(lambda x: self.pause.emit(x))
+        layout.addWidget(self.toggle)
+
+        self.thresholds = RadioButtonGroup([0, 5, 10, 15, 20], int(config.get('brightness.threshold')))
+        self.thresholds.change.connect(lambda x: self.threshold.emit(x))
+        layout.addWidget(self.thresholds)
+        
+        container = QtWidgets.QWidget()
+        container.setContentsMargins(0, 0, 0, 0)
+        container.setLayout(layout)
+        
+        self.setDefaultWidget(container)
 
 
 class BacklightDeviceAction(QtWidgets.QAction):
@@ -63,8 +94,6 @@ class AmbientlightDeviceAction(QtWidgets.QAction):
 
     changed = QtCore.pyqtSignal(int)
     thread = TimeIntervalThread() 
-    device = None
-    value = None
 
     def __init__(self, device, menu):
         super(AmbientlightDeviceAction, self).__init__('{:>s}: {:>.0f} %'.format(
@@ -77,13 +106,20 @@ class AmbientlightDeviceAction(QtWidgets.QAction):
         self.thread.refresh.connect(lambda x: self.refresh())
         self.thread.start()
 
-    def refresh(self):
-        name = self.device.name 
+    @inject.params(config='config')
+    def refresh(self, config):
         brightness = self.device.brightness
         if self.value == brightness: 
             return None
          
-        self.setText('{:>s}: {:>.0f} %'.format(name, brightness))
+        self.setText('{:>s}: {:>.0f} %'.format(
+            self.device.name, brightness
+        ))
+
+        threshold = math.fabs(self.value - brightness)
+        if threshold < int(config.get('brightness.threshold')):
+            return None
+
         self.changed.emit(brightness)
         self.value = brightness
 

@@ -47,8 +47,9 @@ class Application(QtWidgets.QApplication):
 
 if __name__ == "__main__":
     parser = optparse.OptionParser()
-    parser.add_option("--logfile", default='./brightness.log', dest="logfile", help="Logfile location")
     parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Logging level")
+    parser.add_option("--logfile", default=os.path.expanduser('~/.config/brightness/brightness.log'), dest="logfile", help="Logfile location")
+    parser.add_option("--config", default=os.path.expanduser('~/.config/brightness/brightness.conf'), dest="config", help="Config file location")
     
     (options, args) = parser.parse_args()
 

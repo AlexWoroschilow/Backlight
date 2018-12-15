@@ -69,7 +69,7 @@ class Backlight(object):
 
     @brightness.setter
     def brightness(self, percent):
-        for source in glob.glob('%s/brightness' % self.path):
+        for source in glob.glob('{}/brightness'.format(self.path)):
             return self._set(source, percent / 100 * self.max)
         return False
 
@@ -101,7 +101,9 @@ class BacklightPool(object):
 
     @brightness.setter
     def brightness(self, percent):
-        pass
+        for device in self.devices:
+            device.brightness = percent
+            
 
 
 if __name__ == "__main__":
