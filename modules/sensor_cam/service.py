@@ -18,7 +18,7 @@ import logging
 
 import pygame.camera
 
-from webcam.device import Webcam 
+from .webcam.device import Webcam 
 
     
 class WebcamPool(object):
