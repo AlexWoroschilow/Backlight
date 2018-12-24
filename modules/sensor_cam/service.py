@@ -10,12 +10,6 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITION
-import os
-import glob
-import time
-import math
-import logging
-
 import pygame.camera
 
 from .webcam.device import Webcam 

@@ -75,12 +75,10 @@ class Backlight(object):
 
 
 class BacklightPool(object):
-    path = '/sys/class/backlight'
-    value = 0 
 
     @property
     def devices(self):
-        for device in glob.glob('{}/*'.format(self.path)):
+        for device in glob.glob('{}/*'.format('/sys/class/backlight')):
             yield Backlight(device)
 
     @property

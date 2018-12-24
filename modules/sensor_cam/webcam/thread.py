@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import time
 import math
+import inject
 import pygame.camera
 
 from PyQt5 import QtCore
@@ -21,9 +22,10 @@ class TimeIntervalThread(QtCore.QThread):
 
     update = QtCore.pyqtSignal(float)
 
-    def __init__(self, source, width, height):
+    def __init__(self, device, width, height):
         super(TimeIntervalThread, self).__init__()
-        self.source = source 
+        self.source = device.source 
+        self.device = device 
         self.height = height
         self.width = width
 
@@ -34,9 +36,7 @@ class TimeIntervalThread(QtCore.QThread):
     @property
     def brightness(self):
         
-        camera = pygame.camera.Camera(
-            self.source, (self.width, self.height)
-        ) 
+        camera = pygame.camera.Camera(self.source, (self.width, self.height)) 
         
         camera.start()
         time.sleep(0.1)
@@ -51,14 +51,18 @@ class TimeIntervalThread(QtCore.QThread):
                 collection.append(self.brightnessFromRGB(r, g, b))
         return math.floor(sum(collection) / len(collection))
 
-    def run(self):
+    @inject.params(config='config')
+    def run(self, config=None):
         while True:
             try:
+                if not int(config.get('sensors.{}'.format(self.device.code))):
+                    time.sleep(10)
+                    continue
                 brightness = self.brightness
                 if brightness is not None and brightness:
                     self.update.emit(brightness)
             except SystemError:
-                time.sleep(60)
+                time.sleep(10)
                 continue
             time.sleep(60)
 

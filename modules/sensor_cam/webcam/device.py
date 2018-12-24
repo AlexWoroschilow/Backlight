@@ -22,7 +22,7 @@ class Webcam(object):
         self.source = source
         self.value = 0
 
-        self.thread = TimeIntervalThread(source, width, height)
+        self.thread = TimeIntervalThread(self, width, height)
         self.thread.update.connect(self._update)
         self.thread.start()
         
