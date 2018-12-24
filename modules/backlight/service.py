@@ -103,7 +103,6 @@ class BacklightPool(object):
     def brightness(self, percent):
         for device in self.devices:
             device.brightness = percent
-            
 
 
 if __name__ == "__main__":

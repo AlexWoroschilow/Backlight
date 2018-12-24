@@ -30,6 +30,7 @@ class TrayWidget(QtWidgets.QSystemTrayIcon):
     def __init__(self, icon, app=None):
         QtWidgets.QApplication.__init__(self, icon, app)
         self.activated.connect(self.onActionClick)
+        self.setToolTip('Backlight adjuster')
 
         self.menu = QtWidgets.QMenu()
         

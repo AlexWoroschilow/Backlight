@@ -11,11 +11,14 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 
 
 class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        self.setWindowIcon(QtGui.QIcon('icons/backlight.png'))
+        self.setWindowTitle('Backlight adjuster')
         self.setContentsMargins(0, 0, 0, 0)
         
