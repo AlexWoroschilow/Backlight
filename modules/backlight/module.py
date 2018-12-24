@@ -22,8 +22,5 @@ class Loader(Loader):
         return True
 
     def config(self, binder):
-        backlight_pool = BacklightPool()
-        for index, device in enumerate(backlight_pool.devices):
-            binder.bind('backlight.%s' % index, device)
-        binder.bind('backlight', backlight_pool)
+        binder.bind('backlight', BacklightPool())
 

@@ -30,4 +30,4 @@ class Loader(Loader):
 
     @inject.params(window='window')
     def _widget(self, window=None):
-        return TrayWidget(QtGui.QIcon('icons/backlight.svg'), window)
+        return TrayWidget(QtGui.QIcon('icons/backlight.png'), window)

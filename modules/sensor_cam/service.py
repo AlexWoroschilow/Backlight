@@ -20,7 +20,7 @@ import pygame.camera
 
 from .webcam.device import Webcam 
 
-
+    
 class WebcamPool(object):
 
     @property
@@ -35,4 +35,5 @@ if __name__ == "__main__":
     pool = WebcamPool()
     for index, device in enumerate(pool.devices):
         print(device.name, device.brightness)
+        device.thread.wait()
             
