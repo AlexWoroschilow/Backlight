@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import glob
 from lib.plugin import Loader
 
 from .service import AmbientlightPool
@@ -21,6 +22,11 @@ class Loader(Loader):
     def enabled(self):
         return True
 
-    def config(self, binder):
-        binder.bind('al-sensors', AmbientlightPool())
+    @property
+    def devices(self):
+        return [x for x in glob.glob('{}/*'.format('/sys/bus/iio/devices'))]
 
+    def config(self, binder):
+        if not len(self.devices):
+            return binder.bind('al-sensors', None)
+        binder.bind('al-sensors', AmbientlightPool())

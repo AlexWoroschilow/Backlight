@@ -28,6 +28,7 @@ class WebcamPool(object):
         pygame.camera.init()
         for device in pygame.camera.list_cameras():
             yield Webcam(device)
+        pygame.camera.quit()
 
 
 if __name__ == "__main__":

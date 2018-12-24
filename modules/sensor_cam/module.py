@@ -26,7 +26,7 @@ class Loader(Loader):
         if loader is None or not loader:
             binder.bind('webcameras', None)
             return None
-
+        
         from .service import WebcamPool
         binder.bind('webcameras', WebcamPool())
 

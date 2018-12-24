@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITION
 import os
 
-import pygame.camera
 from .thread import TimeIntervalThread
 
 
@@ -23,8 +22,7 @@ class Webcam(object):
         self.source = source
         self.value = 0
 
-        camera = pygame.camera.Camera(source, (width, height)) 
-        self.thread = TimeIntervalThread(camera, width, height)
+        self.thread = TimeIntervalThread(source, width, height)
         self.thread.update.connect(self._update)
         self.thread.start()
         

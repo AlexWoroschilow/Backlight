@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import time
 import math
+import pygame.camera
 
 from PyQt5 import QtCore
 
@@ -20,30 +21,34 @@ class TimeIntervalThread(QtCore.QThread):
 
     update = QtCore.pyqtSignal(float)
 
-    def __init__(self, camera, width, height):
+    def __init__(self, source, width, height):
         super(TimeIntervalThread, self).__init__()
-        self.camera = camera
+        self.source = source 
         self.height = height
         self.width = width
 
-    def _brightness(self, r, g, b):
+    def brightnessFromRGB(self, r, g, b):
         brightness = (r + r + b + g + g + g) / 6
         return (brightness / 255) * 100 
 
     @property
     def brightness(self):
         
-        self.camera.start()
+        camera = pygame.camera.Camera(
+            self.source, (self.width, self.height)
+        ) 
+        
+        camera.start()
         time.sleep(0.1)
         
-        image = self.camera.get_image()
-        self.camera.stop()
+        image = camera.get_image()
+        camera.stop()
     
         collection = []
         for x in range(0, self.width):
             for y in range(0, self.height):
                 r, g, b, a = image.get_at((x, y))
-                collection.append(self._brightness(r, g, b))
+                collection.append(self.brightnessFromRGB(r, g, b))
         return math.floor(sum(collection) / len(collection))
 
     def run(self):
@@ -51,8 +56,9 @@ class TimeIntervalThread(QtCore.QThread):
             try:
                 brightness = self.brightness
                 if brightness is not None and brightness:
-                    self.update.emit(brightness)
+                    self.update.emit(10)
             except SystemError:
+                time.sleep(60)
                 continue
             time.sleep(60)
 

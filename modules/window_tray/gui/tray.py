@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt 
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 
@@ -28,8 +27,7 @@ class TrayWidget(QtWidgets.QSystemTrayIcon):
 
     quit = QtCore.pyqtSignal()
     
-    @inject.params(backlight='backlight', sensors='sensors')
-    def __init__(self, icon, app=None, backlight=None, sensors=None):
+    def __init__(self, icon, app=None):
         QtWidgets.QApplication.__init__(self, icon, app)
         self.activated.connect(self.onActionClick)
 
