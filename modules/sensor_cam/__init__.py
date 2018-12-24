@@ -10,20 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from lib.plugin import Loader
-
-from .service import AmbientlightPool
-
-
-class Loader(Loader):
-
-    @property
-    def enabled(self):
-        return True
-
-    def config(self, binder):
-        backlight_pool = AmbientlightPool()
-        for index, device in enumerate(backlight_pool.devices):
-            binder.bind('ambientlight.%s' % index, device)
-        binder.bind('ambientlight', backlight_pool)
-
+try:
+    from module import Loader
+except ImportError:
+    from .module import Loader

@@ -33,6 +33,8 @@ class ConfigService(object):
             self._parser.set('brightness', 'threshold', '5')
             self._parser.set('brightness', 'pause', '0')
 
+            self._parser.add_section('sensors')
+
             self._parser.write(stream)
             stream.close()
             

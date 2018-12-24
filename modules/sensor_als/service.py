@@ -14,7 +14,7 @@ import os
 import glob
 
 
-class Backlight(object):
+class Ambientlight(object):
 
     def __init__(self, path=None):
         self.path = path
@@ -72,25 +72,11 @@ class Backlight(object):
 
 
 class AmbientlightPool(object):
-    path = '/sys/bus/iio/devices'
 
     @property
     def devices(self):
-        for device in glob.glob('{}/*'.format(self.path)):
-            yield Backlight(device)
-
-
-class AmbientlightManager(object):
-    
-    pool = AmbientlightPool()
-    
-    @property
-    def brightness(self):
-        pass
-
-    @brightness.setter
-    def brightness(self, percent):
-        pass
+        for device in glob.glob('{}/*'.format('/sys/bus/iio/devices')):
+            yield Ambientlight(device)
 
 
 if __name__ == "__main__":

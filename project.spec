@@ -5,7 +5,7 @@ Release: %(date +"%Y%m%d")
 Source0: %{name}-%{version}.tar.gz
 Group: Application/Web
 License: MIT
-Requires: python3 python3-qt5
+Requires: python3 python3-qt5 python3-pygame
 
 %description
 Read the ambient light sensor data if present and adjust the backlight according to the abient light. 

@@ -11,13 +11,15 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-import math
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt 
 
-from .thread import TimeIntervalThread
-from .radio import RadioButtonGroup 
+from .label import BacklightLabel
+from .button import SensorsRadioButton
+
+from .widget import ThresholdsWidget
 
 
 class MenuSettingsAction(QtWidgets.QWidgetAction):
@@ -32,11 +34,11 @@ class MenuSettingsAction(QtWidgets.QWidgetAction):
         layout = QtWidgets.QVBoxLayout()
 
         self.toggle = QtWidgets.QCheckBox('Enabled')
-        self.toggle.setChecked(bool(config.get('brightness.pause')))
+        self.toggle.setChecked(int(config.get('brightness.enabled')))
         self.toggle.stateChanged.connect(lambda x: self.pause.emit(x))
         layout.addWidget(self.toggle)
 
-        self.thresholds = RadioButtonGroup([0, 5, 10, 15, 20], int(config.get('brightness.threshold')))
+        self.thresholds = ThresholdsWidget()
         self.thresholds.change.connect(lambda x: self.threshold.emit(x))
         layout.addWidget(self.thresholds)
         
@@ -47,82 +49,63 @@ class MenuSettingsAction(QtWidgets.QWidgetAction):
         self.setDefaultWidget(container)
 
 
-class BacklightDeviceAction(QtWidgets.QAction):
+class MenuSensorsAction(QtWidgets.QWidgetAction):
 
-    changed = QtCore.pyqtSignal(int)
+    sensor = QtCore.pyqtSignal(bool, object)
+    ambientLight = QtCore.pyqtSignal(int)
 
-    thread = TimeIntervalThread() 
-    device = None
-    value = None
-    adjust = True
-
-    def __init__(self, device, menu):
-        super(BacklightDeviceAction, self).__init__('{:>s}: {:>.0f} %'.format(
-            device.name, device.brightness
-        ), menu)
+    @inject.params(config='config', sensors='sensors')
+    def __init__(self, parent, config, sensors):
+        super(MenuSensorsAction, self).__init__(parent)
         
-        self.value = device.brightness
-        self.device = device
+        layout = QtWidgets.QVBoxLayout()
+
+        self.label = QtWidgets.QLabel('Sensors')
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
+
+        for device in sensors.devices:
+            checkbox = SensorsRadioButton(device)
+            checkbox.setChecked(int(config.get('sensors.{}'.format(device.code))))
+            checkbox.ambientLight.connect(lambda x: self.ambientLight.emit(x))
+            layout.addWidget(checkbox)
+
+        container = QtWidgets.QWidget()
+        container.setContentsMargins(0, 0, 0, 0)
+        container.setLayout(layout)
         
-        self.thread.refresh.connect(lambda x: self.refresh())
-        self.thread.start()
-
-    def refresh(self):
-        name = self.device.name 
-        brightness = self.device.brightness
-        if self.value == brightness: 
-            return None
-         
-        self.setText('{:>s}: {:>.0f} %'.format(name, brightness))
-        self.changed.emit(brightness)
-        self.value = brightness
-
-    def change(self, value=None):
-        if value is None or not self.adjust:
-            return None
-        self.device.brightness = value if value >= 5 else 5
-        return None
-
-    def adjust(self, value=None):
-        self.adjust = value
-
-    def quit(self):
-        self.thread.exit()
+        self.setDefaultWidget(container)
 
 
-class AmbientlightDeviceAction(QtWidgets.QAction):
+class MenuBacklightAction(QtWidgets.QWidgetAction):
 
-    changed = QtCore.pyqtSignal(int)
-    thread = TimeIntervalThread() 
-
-    def __init__(self, device, menu):
-        super(AmbientlightDeviceAction, self).__init__('{:>s}: {:>.0f} %'.format(
-            device.name, device.brightness
-        ), menu)
+    @inject.params(backlights='backlight')
+    def __init__(self, parent, backlights):
+        super(MenuBacklightAction, self).__init__(parent)
         
-        self.value = device.brightness
-        self.device = device
+        layout = QtWidgets.QVBoxLayout()
+
+        self.label = QtWidgets.QLabel('Backlight')
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
+
+        for device in backlights.devices:
+            layout.addWidget(BacklightLabel(device))
+
+        container = QtWidgets.QWidget()
+        container.setContentsMargins(0, 0, 0, 0)
+        container.setLayout(layout)
         
-        self.thread.refresh.connect(lambda x: self.refresh())
-        self.thread.start()
+        self.setDefaultWidget(container)
 
-    @inject.params(config='config')
-    def refresh(self, config):
-        brightness = self.device.brightness
-        if self.value == brightness: 
-            return None
-         
-        self.setText('{:>s}: {:>.0f} %'.format(
-            self.device.name, brightness
-        ))
+    def onActionPause(self, value):
+        self.pause = value
 
-        threshold = math.fabs(self.value - brightness)
-        if threshold < int(config.get('brightness.threshold')):
-            return None
-
-        self.changed.emit(brightness)
-        self.value = brightness
-
-    def quit(self):
-        self.thread.exit()
+    @inject.params(backlights='backlight')
+    def onActionAmbientLight(self, value, backlights):
+        for device in backlights.devices:
+            if value is not None and value < 5:
+                device.brightness = 5
+            if value is not None and value >= 5:
+                device.brightness = value
 

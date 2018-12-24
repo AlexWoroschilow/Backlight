@@ -17,7 +17,11 @@ from PyQt5 import QtCore
 class TimeIntervalThread(QtCore.QThread):
 
     refresh = QtCore.pyqtSignal(object)
-    interval = 1
+    interval = 5
+
+    def __init__(self, interval=5):
+        super(TimeIntervalThread, self).__init__()
+        self.interval = interval
 
     def run(self):
         starttime = time.time()

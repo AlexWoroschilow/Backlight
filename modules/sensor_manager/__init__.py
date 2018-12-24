@@ -10,24 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
-
-from PyQt5 import QtGui
-
-from lib.plugin import Loader
-
-from .gui.tray import TrayWidget
-
-
-class Loader(Loader):
-
-    @property
-    def enabled(self):
-        return True
-
-    def config(self, binder=None):
-        binder.bind_to_constructor('window.tray', self._widget)
-
-    @inject.params(window='window')
-    def _widget(self, window=None):
-        return TrayWidget(QtGui.QIcon('icons/backlight.svg'), window)
+try:
+    from module import Loader
+except ImportError:
+    from .module import Loader

@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 # -*- coding: utf-8 -*-
 # Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
 #
@@ -19,7 +18,7 @@ abspath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(abspath))
 
 root = os.path.dirname(abspath)
-sys.path.append('/{}/lib'.format(root))
+sys.path.append('{}/lib'.format(root))
 
 import inject
 import optparse

@@ -12,57 +12,50 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt 
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 
-from .menu import BacklightDeviceAction
-from .menu import AmbientlightDeviceAction
 from .menu import MenuSettingsAction
+from .menu import MenuSensorsAction
+from .menu import MenuBacklightAction
 
 
-class DictionaryTray(QtWidgets.QSystemTrayIcon):
-    
-    ambientlights = []
+class TrayWidget(QtWidgets.QSystemTrayIcon):
     
     pause = QtCore.pyqtSignal(int)
     threshold = QtCore.pyqtSignal(int)
 
     quit = QtCore.pyqtSignal()
     
-    @inject.params(backlight='backlight', ambientlight='ambientlight')
-    def __init__(self, icon, app=None, backlight=None, ambientlight=None):
+    @inject.params(backlight='backlight', sensors='sensors')
+    def __init__(self, icon, app=None, backlight=None, sensors=None):
         QtWidgets.QApplication.__init__(self, icon, app)
         self.activated.connect(self.onActionClick)
 
         self.menu = QtWidgets.QMenu()
         
         self.settings = MenuSettingsAction(self)
-        self.settings.pause.connect(lambda x: self.pause.emit(x))
         self.settings.threshold.connect(self.onActionThreshold)
+        self.settings.pause.connect(self.onActionPause)
         self.menu.addAction(self.settings)
 
         self.menu.addSeparator()
 
-        for device in ambientlight.devices:
-            ambientlight_device = AmbientlightDeviceAction(device, self.menu)
-            self.ambientlights.append(ambientlight_device)
-            self.quit.connect(ambientlight_device.quit)
-            self.menu.addAction(ambientlight_device)
-        
-        for device in backlight.devices:
-            backlight_device = BacklightDeviceAction(device, self.menu)
-            for index, ambientlight in enumerate(self.ambientlights):
-                ambientlight.changed.connect(backlight_device.change)
-                backlight_device.change(ambientlight.device.brightness)
-            self.pause.connect(backlight_device.adjust)
-            self.quit.connect(backlight_device.quit)
-            self.menu.addAction(backlight_device)
+        self.sensors = MenuSensorsAction(self)
+        self.menu.addAction(self.sensors)
 
         self.menu.addSeparator()
 
-        exit = QtWidgets.QAction('Quit', self.menu)
-        exit.triggered.connect(lambda x: self.quit.emit())        
-        self.menu.addAction(exit)
+        self.backlight = MenuBacklightAction(self)
+        self.sensors.ambientLight.connect(self.backlight.onActionAmbientLight)
+        self.menu.addAction(self.backlight)
+        
+        self.menu.addSeparator()
+
+        button = QtWidgets.QAction('Quit', self.menu)
+        button.triggered.connect(lambda x: self.quit.emit())        
+        self.menu.addAction(button)
 
         self.setContextMenu(self.menu)
 
@@ -73,5 +66,10 @@ class DictionaryTray(QtWidgets.QSystemTrayIcon):
             self.menu.exec_(QtGui.QCursor.pos())
 
     @inject.params(config='config')
-    def onActionThreshold(self, threshold, config):
-        config.set('brightness.threshold', '{}'.format(threshold))
+    def onActionPause(self, value=None, config=None):
+        config.set('brightness.enabled', '{}'.format(int(value)))
+
+    @inject.params(config='config')
+    def onActionThreshold(self, value=None, config=None):
+        config.set('brightness.threshold', '{}'.format(int(value)))
+
