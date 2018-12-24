@@ -55,8 +55,6 @@ class TrayWidget(QtWidgets.QSystemTrayIcon):
         button.triggered.connect(lambda x: self.quit.emit())        
         self.menu.addAction(button)
 
-        self.setContextMenu(self.menu)
-
         self.show()
 
     def onActionClick(self, value):
