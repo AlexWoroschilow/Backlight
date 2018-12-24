@@ -34,6 +34,7 @@ class Application(QtWidgets.QApplication):
 
     def __init__(self, options=None, args=None):
         super(Application, self).__init__(sys.argv)
+        self.setApplicationName('Backlight adjuster')
         self.kernel = Kernel(self, options, args)
         self.kernel.aplication = self
 
