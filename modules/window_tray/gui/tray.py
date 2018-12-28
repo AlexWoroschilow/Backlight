@@ -50,12 +50,6 @@ class TrayWidget(QtWidgets.QSystemTrayIcon):
         self.sensors.ambientLight.connect(self.backlight.onActionAmbientLight)
         self.menu.addAction(self.backlight)
         
-        self.menu.addSeparator()
-
-        button = QtWidgets.QAction('Quit', self.menu)
-        button.triggered.connect(lambda x: self.quit.emit())        
-        self.menu.addAction(button)
-
         self.show()
 
     def onActionClick(self, value):

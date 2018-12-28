@@ -44,6 +44,7 @@ class MenuSettingsAction(QtWidgets.QWidgetAction):
         
         container = QtWidgets.QWidget()
         container.setContentsMargins(0, 0, 0, 0)
+        container.setMinimumWidth(190)
         container.setLayout(layout)
         
         self.setDefaultWidget(container)

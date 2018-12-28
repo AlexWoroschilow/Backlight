@@ -65,7 +65,7 @@ class SensorsRadioButton(QtWidgets.QRadioButton):
 
         if int(config.get('brightness.enabled')):
             self.ambientLight.emit(brightness)
-        self.brightness = brightness
+            self.brightness = brightness
 
     def quit(self):
         self.thread.exit()
