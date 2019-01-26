@@ -10,3 +10,4 @@ PYTHON=$(which python3)
 
 
 exec ${PYTHON} ${APPDIR}/opt/application/main.py --loglevel=WARNING > /dev/null 2>&1
+exit 0
