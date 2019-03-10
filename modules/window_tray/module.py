@@ -28,6 +28,12 @@ class Loader(Loader):
     def config(self, binder=None):
         binder.bind_to_constructor('window.tray', self._widget)
 
-    @inject.params(window='window')
-    def _widget(self, window=None):
-        return TrayWidget(QtGui.QIcon('icons/backlight.svg'), window)
+    @inject.params(window='window', icon='icon')
+    def _widget(self, window=None, icon=None):
+        if window is None: return None
+        if icon is None: return None
+
+        widget = TrayWidget(icon, window)
+        widget.ambientLight.connect(lambda x: window.setAmbientLight(x))
+        widget.backgroundLight.connect(lambda x: window.setBacklight(x))
+        return widget

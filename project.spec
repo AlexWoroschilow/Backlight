@@ -1,5 +1,5 @@
-Summary: Backlight adjuster 
-Name: backlight
+Summary: Ambient light brightness 
+Name: ambient-light-brightness
 Version: 0.1
 Release: %(date +"%Y%m%d")
 Source0: %{name}-%{version}.tar.gz
@@ -17,18 +17,18 @@ If the ssytem has no ambient light sensor, the program will get the ambient ligh
 %install
 
 install -d $RPM_BUILD_ROOT/usr/bin
-cp backlight $RPM_BUILD_ROOT/usr/bin
+cp ambient-light-brightness $RPM_BUILD_ROOT/usr/bin
 
 install -d $RPM_BUILD_ROOT/usr/share/applications
-cp Brightness.desktop $RPM_BUILD_ROOT/usr/share/applications
+cp Ambient-light-brightness.desktop $RPM_BUILD_ROOT/usr/share/applications
 
 install -d $RPM_BUILD_ROOT/etc/udev/rules.d
-cp 80-backlight.rules $RPM_BUILD_ROOT/etc/udev/rules.d
+cp 80-ambient-light-brightness.rules $RPM_BUILD_ROOT/etc/udev/rules.d
 
 
 %files
-%attr(644,root,root) /etc/udev/rules.d/80-backlight.rules
-%attr(755,root,root) /usr/share/applications/Brightness.desktop
-%attr(755,root,root) /usr/bin/backlight
+%attr(644,root,root) /etc/udev/rules.d/80-ambient-light-brightness.rules
+%attr(755,root,root) /usr/share/applications/Ambient-light-brightness.desktop
+%attr(755,root,root) /usr/bin/ambient-light-brightness
 
 

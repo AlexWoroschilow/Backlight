@@ -33,10 +33,12 @@ class Webcam(object):
 
     @property
     def code(self):
+        if not os.path.exists(self.source): return None
         return os.path.basename(self.source)
 
     @property
     def name(self):
+        if not os.path.exists(self.source): return None
         name = os.path.basename(self.source)
         return name.capitalize() 
 

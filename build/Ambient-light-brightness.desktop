@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=Brightness
-Exec=/usr/bin/brightness
-Icon=brightness
+Name=Ambient light brightness
+Exec=AppRun
+Icon=icon
 Type=Application
 Categories=Utility;Settings;DesktopSettings;

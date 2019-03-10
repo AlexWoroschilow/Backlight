@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITION
 import os
 import glob
+import logging
 
 
 class Ambientlight(object):
@@ -21,28 +22,33 @@ class Ambientlight(object):
 
     def _get(self, path=None):
         try:
-            if not path or not os.path.isfile(path):
-                return None
+            if not os.path.isfile(path): return None
+            if not os.path.exists(path): return None
             with open(path, 'r', errors='ignore') as stream:
                 return stream.read().strip("\n")
         except (OSError, IOError) as ex:
+            logger = logging.getLogger('ambient-light')
+            logger.error(ex)
             return None
         return None
 
     def _set(self, path=None, value=None):
         try:
-            if not path or not os.path.isfile(path):
-                return None
+            if not os.path.isfile(path): return None
+            if not os.path.exists(path): return None
             with open(path, 'w', errors='ignore') as stream:
-                stream.write(value)
-                stream.close()
+                stream.write(value).close()
         except (OSError, IOError) as ex:
+            logger = logging.getLogger('ambient-light')
+            logger.error(ex)
             return None
         return None
 
     @property
     def code(self):
         for source in glob.glob('%s/name' % self.path):
+            if not os.path.exists(source): return None 
+            if not os.path.isfile(source): return None 
             return self._get(source)
         return None
 
@@ -59,6 +65,8 @@ class Ambientlight(object):
     @property
     def actual(self):
         for source in glob.glob('%s/in_illuminance_input' % self.path):
+            if not os.path.exists(source): return None 
+            if not os.path.isfile(source): return None 
             return int(self._get(source))
         return None
 
@@ -76,6 +84,8 @@ class AmbientlightPool(object):
     @property
     def devices(self):
         for device in glob.glob('{}/*'.format('/sys/bus/iio/devices')):
+            if not os.path.exists(device): return None 
+            if not os.path.isdir(device): return None 
             yield Ambientlight(device)
 
 

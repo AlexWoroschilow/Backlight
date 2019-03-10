@@ -26,9 +26,9 @@ class SensorsRadioButton(QtWidgets.QRadioButton):
     @inject.params(config='config')
     def __init__(self, device, config=None):
         self.name = device.name
-        self.brightness = device.brightness
         self.code = device.code
         self.device = device
+        self.brightness = 0
         
         super(SensorsRadioButton, self).__init__("{}: {:>.0f} %".format(
             self.name, self.brightness

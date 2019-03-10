@@ -24,22 +24,17 @@ class TrayWidget(QtWidgets.QSystemTrayIcon):
     
     pause = QtCore.pyqtSignal(int)
     threshold = QtCore.pyqtSignal(int)
+    ambientLight = QtCore.pyqtSignal(int)
+    backgroundLight = QtCore.pyqtSignal(int)
 
     quit = QtCore.pyqtSignal()
     
     def __init__(self, icon, app=None):
         QtWidgets.QApplication.__init__(self, icon, app)
         self.activated.connect(self.onActionClick)
-        self.setToolTip('Backlight adjuster')
+        self.setToolTip('Ambient light brightness')
 
         self.menu = QtWidgets.QMenu()
-        
-        self.settings = MenuSettingsAction(self)
-        self.settings.threshold.connect(self.onActionThreshold)
-        self.settings.pause.connect(self.onActionPause)
-        self.menu.addAction(self.settings)
-
-        self.menu.addSeparator()
 
         self.sensors = MenuSensorsAction(self)
         self.menu.addAction(self.sensors)
@@ -48,7 +43,16 @@ class TrayWidget(QtWidgets.QSystemTrayIcon):
 
         self.backlight = MenuBacklightAction(self)
         self.sensors.ambientLight.connect(self.backlight.onActionAmbientLight)
+        self.sensors.ambientLight.connect(lambda x: self.ambientLight.emit(x))
+        self.sensors.ambientLight.connect(lambda x: self.backgroundLight.emit(x))
         self.menu.addAction(self.backlight)
+
+        self.menu.addSeparator()
+
+        self.settings = MenuSettingsAction(self)
+        self.settings.threshold.connect(self.onActionThreshold)
+        self.settings.pause.connect(self.onActionPause)
+        self.menu.addAction(self.settings)
         
         self.show()
 

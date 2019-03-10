@@ -21,6 +21,7 @@ class WebcamPool(object):
     def devices(self):
         pygame.camera.init()
         for device in pygame.camera.list_cameras():
+            if device is None: continue
             yield Webcam(device)
         pygame.camera.quit()
 

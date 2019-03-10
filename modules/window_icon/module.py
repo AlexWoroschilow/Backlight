@@ -21,17 +21,17 @@ from lib.plugin import Loader
 class Loader(Loader):
 
     @property
-    def config(self):
-        return None
-
-    @property
     def enabled(self):
-        if hasattr(self._options, 'converter'):
-            return not self._options.converter
         if platform.system() in ["Linux"]:
             return True
         return False
 
-    @inject.params(window='window')
-    def boot(self, options=None, args=None, window=None):
-        window.setWindowIcon(QtGui.QIcon("icons/backlight.svg"))
+    def config(self, binder=None):
+        binder.bind('icon', QtGui.QIcon("icons/icon.svg"))
+
+    @inject.params(window='window', icon='icon')
+    def boot(self, options=None, args=None, window=None, icon=None):
+        if options is None or args is None: return None
+        if window is None or icon is None: return None
+        
+        window.setWindowIcon(icon)

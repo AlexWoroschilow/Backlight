@@ -11,6 +11,8 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+from PyQt5 import QtGui
+from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
 
@@ -24,9 +26,13 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        
         binder.bind_to_constructor('window', self._widget)
 
-    def _widget(self):
-        
-        return MainWindow()
+    @inject.params(icon='icon', sensors='sensors')
+    def _widget(self, icon=None, sensors=None):
+        if sensors is None: return None
+        if icon is None: return None
+
+        widget = MainWindow(icon)
+        return widget
+            
