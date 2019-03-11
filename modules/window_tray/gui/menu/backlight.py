@@ -31,11 +31,14 @@ class MenuBacklightAction(QtWidgets.QWidgetAction):
         
         layout = QtWidgets.QGridLayout()
 
+        collection = [device for device in backlight.devices]
+        if not len(collection): return None
+
         self.label = QtWidgets.QLabel('Backlight')
         self.label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.label, 0, 0, 1, 2)
+        layout.addWidget(self.label, 0, 0, 1, len(collection))
         
-        for index, device in enumerate(backlight.devices):
+        for index, device in enumerate(collection):
             if device is None: continue
             gauge = Gauge(None, 100)
             layout.addWidget(gauge, 1, index)
