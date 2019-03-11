@@ -54,9 +54,7 @@ class Ambientlight(object):
 
     @property
     def name(self):
-        return self.code\
-            .replace('-', ' ')\
-            .capitalize() 
+        return "Ambient light" 
 
     @property
     def max(self):

@@ -40,7 +40,7 @@ class Webcam(object):
     def name(self):
         if not os.path.exists(self.source): return None
         name = os.path.basename(self.source)
-        return name.capitalize() 
+        return "Webcamera"
 
     @property
     def brightness(self):

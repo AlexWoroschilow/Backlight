@@ -14,7 +14,7 @@ import math
 import inject    
 from PyQt5 import QtWidgets
 
-from .thread import TimeIntervalThread
+from modules.window_tray.gui.menu.thread import TimeIntervalThread
 
 
 class BacklightLabel(QtWidgets.QLabel):
@@ -22,9 +22,9 @@ class BacklightLabel(QtWidgets.QLabel):
     thread = TimeIntervalThread(1) 
 
     def __init__(self, device):
-        super(BacklightLabel, self).__init__("{}: {:>.0f} %".format(
-            device.name, device.brightness
-        ))
+        
+        text = "{}: {:>.0f} %".format(device.name, device.brightness)
+        super(BacklightLabel, self).__init__(text)
         
         self.value = device.brightness
         self.device = device
@@ -33,14 +33,15 @@ class BacklightLabel(QtWidgets.QLabel):
         self.thread.start()
         
     @inject.params(config='config')
-    def refresh(self, event, config):
+    def refresh(self, event=None, config=None):
+        if config is None: return None
+        if event is None: return None
+
         brightness = self.device.brightness
-        if self.value == brightness: 
-            return None
+        if self.value == brightness: return None
          
-        self.setText('{:>s}: {:>.0f} %'.format(
-            self.device.name, brightness
-        ))
+        text = '{:>s}: {:>.0f} %'.format(self.device.name, brightness)
+        self.setText(text)
 
         threshold = math.fabs(self.value - brightness)
         if threshold < int(config.get('brightness.threshold')):

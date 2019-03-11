@@ -11,37 +11,11 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-import functools
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from .label import BacklightLabel
-
-
-class ThresholdsWidget(QtWidgets.QWidget):
-
-    change = QtCore.pyqtSignal(int)
-
-    @inject.params(config='config')
-    def __init__(self, config):
-        super(ThresholdsWidget, self).__init__()
-
-        layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        
-        self.setLayout(layout)
-
-        for value in [0, 5, 10, 15, 20]:
-            checkbox = QtWidgets.QRadioButton('Threshold {} %'.format(value))
-            checkbox.setChecked(value == int(config.get('brightness.threshold')))
-            action = functools.partial(self.onActionThreshold, threshold=value) 
-            checkbox.toggled.connect(action)
-            layout.addWidget(checkbox)
-
-    def onActionThreshold(self, event, threshold):
-        self.change.emit(threshold)     
-
 
 
 class BacklightWidget(QtWidgets.QWidget):

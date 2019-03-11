@@ -18,8 +18,12 @@ from PyQt5 import QtQuick
 
 class Gauge(QtWidgets.QWidget):
 
-    def __init__(self):
+    def __init__(self, min_width=None, min_height=100):
         super(Gauge, self).__init__()
+        if min_height is not None: self.setMinimumHeight(min_height)
+        if min_width is not None: self.setMinimumWidth(min_width)
+        
+        
         layout = QtWidgets.QVBoxLayout()
         self.setLayout(layout)
 
@@ -28,11 +32,11 @@ class Gauge(QtWidgets.QWidget):
         
         source = '{}/gauge.qml'.format(os.path.dirname(__file__))
         if not os.path.exists(source): return None
-        self.chart.setSource(QtCore.QUrl(source))
+        if not os.path.isfile(source): return None
 
-        container = QtWidgets.QWidget.createWindowContainer(self.chart, self);
-        container.setMinimumHeight(120);
+        self.chart.setSource(QtCore.QUrl(source))
         
+        container = QtWidgets.QWidget.createWindowContainer(self.chart, self)
         layout.addWidget(container)
 
     def value(self, percent=None):

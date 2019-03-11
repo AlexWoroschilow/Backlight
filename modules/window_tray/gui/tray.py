@@ -15,9 +15,9 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 
-from .menu import MenuSettingsAction
-from .menu import MenuSensorsAction
-from .menu import MenuBacklightAction
+from .menu.settings import MenuSettingsAction
+from .menu.sensor import MenuSensorsAction
+from .menu.backlight import MenuBacklightAction
 
 
 class TrayWidget(QtWidgets.QSystemTrayIcon):

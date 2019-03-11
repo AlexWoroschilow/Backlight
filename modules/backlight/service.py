@@ -52,9 +52,14 @@ class Backlight(object):
 
     @property
     def name(self):
-        return self.code\
-            .replace('_', ' ')\
-            .capitalize() 
+        if self.code.find('intel') is not -1: return 'Intel'
+        if self.code.find('gmux') is not -1: return 'Apple'
+        if self.code.find('nv') is not -1: return 'NVidia'
+        if self.code.find('radeon') is not -1: return 'AMD'
+        if self.code.find('amd') is not -1: return 'AMD'
+        if self.code.find('ati') is not -1: return 'AMD'
+        if self.code.find('fglrx') is not -1: return 'AMD'
+        return 'Unknown'
 
     @property
     def max(self):
