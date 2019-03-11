@@ -61,7 +61,8 @@ class TimeIntervalThread(QtCore.QThread):
                 brightness = self.brightness
                 if brightness is not None and brightness:
                     self.update.emit(brightness)
-            except SystemError:
+            except (SystemError) as error:
+                print(error)
                 time.sleep(10)
                 continue
             time.sleep(60)

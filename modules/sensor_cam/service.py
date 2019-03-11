@@ -21,8 +21,11 @@ class WebcamPool(object):
     def devices(self):
         pygame.camera.init()
         for device in pygame.camera.list_cameras():
-            if device is None: continue
             yield Webcam(device)
+            # TODO: fix this, this only necessary
+            # because of the strange /dev/video1 device 
+            # with no formats of images possible
+            break
         pygame.camera.quit()
 
 

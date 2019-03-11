@@ -39,8 +39,7 @@ class Webcam(object):
     @property
     def name(self):
         if not os.path.exists(self.source): return None
-        name = os.path.basename(self.source)
-        return "Webcamera"
+        return "Web camera"
 
     @property
     def brightness(self):
