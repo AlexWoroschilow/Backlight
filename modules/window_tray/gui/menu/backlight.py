@@ -20,14 +20,15 @@ from .widget.gauge import Gauge
 from .thread import TimeIntervalThread
 
 
-class MenuBacklightAction(QtWidgets.QWidgetAction):
+class MenuBacklightAction(QtWidgets.QGroupBox):
 
     thread = TimeIntervalThread() 
 
     @inject.params(backlight='backlight')
-    def __init__(self, parent=None, backlight=None):
-        if parent is None: return None
-        super(MenuBacklightAction, self).__init__(parent)
+    def __init__(self, backlight=None):
+        if backlight is None: return None
+        super(MenuBacklightAction, self).__init__()
+        self.setMinimumWidth(120)
         
         layout = QtWidgets.QGridLayout()
 
@@ -40,7 +41,7 @@ class MenuBacklightAction(QtWidgets.QWidgetAction):
         
         for index, device in enumerate(collection):
             if device is None: continue
-            gauge = Gauge(None, 100)
+            gauge = Gauge(None, 100 if len(collection) > 1 else 120)
             layout.addWidget(gauge, 1, index)
             label = QtWidgets.QLabel(device.name)
             label.setAlignment(Qt.AlignCenter)
@@ -49,11 +50,8 @@ class MenuBacklightAction(QtWidgets.QWidgetAction):
             action = functools.partial(self.refresh, chart=gauge, device=device) 
             self.thread.refresh.connect(action)
 
-        container = QtWidgets.QWidget()
-        container.setStyleSheet('QWidget { background-color: #ffffff }')
-        container.setLayout(layout)
+        self.setLayout(layout)
         
-        self.setDefaultWidget(container)
         self.thread.start()
 
     def onActionPause(self, value):

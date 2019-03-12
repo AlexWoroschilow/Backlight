@@ -15,6 +15,7 @@ import functools
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 
 
 class ThresholdWidget(QtWidgets.QWidget):
@@ -26,7 +27,7 @@ class ThresholdWidget(QtWidgets.QWidget):
         super(ThresholdWidget, self).__init__()
 
         layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setAlignment(Qt.AlignTop)
         
         self.setLayout(layout)
 

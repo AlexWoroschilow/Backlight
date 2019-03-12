@@ -23,7 +23,7 @@ from .widget.gauge import Gauge
 from .thread import TimeIntervalThread
 
 
-class MenuSensorsAction(QtWidgets.QWidgetAction):
+class MenuSensorsAction(QtWidgets.QGroupBox):
 
     brightness = 0
     sensor = QtCore.pyqtSignal(bool, object)
@@ -31,10 +31,17 @@ class MenuSensorsAction(QtWidgets.QWidgetAction):
     thread = TimeIntervalThread() 
 
     @inject.params(config='config', sensors='sensors')
-    def __init__(self, parent, config, sensors):
-        super(MenuSensorsAction, self).__init__(parent)
+    def __init__(self, config=None, sensors=None):
+        if sensors is None: return None
+        if config is None: return None
+        super(MenuSensorsAction, self).__init__()
+        self.setMinimumWidth(120)
         
         layout = QtWidgets.QVBoxLayout()
+
+        self.label = QtWidgets.QLabel('Ambient light')
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
 
         self.gauge = Gauge(None, 120)
         self.ambientLight.connect(self.gauge.value)
@@ -55,12 +62,7 @@ class MenuSensorsAction(QtWidgets.QWidgetAction):
             
             layout.addWidget(checkbox)
 
-        container = QtWidgets.QWidget()
-        container.setContentsMargins(0, 0, 0, 0)
-        container.setStyleSheet('QWidget { background-color: #ffffff }')
-        container.setLayout(layout)
-        
-        self.setDefaultWidget(container)
+        self.setLayout(layout)
 
         self.thread.start()
 

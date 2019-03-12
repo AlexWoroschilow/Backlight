@@ -15,18 +15,15 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 
-from .menu.settings import MenuSettingsAction
-from .menu.sensor import MenuSensorsAction
-from .menu.backlight import MenuBacklightAction
+from .menu.container import MenuContainerWidget
 
 
 class TrayWidget(QtWidgets.QSystemTrayIcon):
     
     pause = QtCore.pyqtSignal(int)
     threshold = QtCore.pyqtSignal(int)
-    ambientLight = QtCore.pyqtSignal(int)
     backgroundLight = QtCore.pyqtSignal(int)
-
+    ambientLight = QtCore.pyqtSignal(int)
     quit = QtCore.pyqtSignal()
     
     def __init__(self, icon, app=None):
@@ -36,23 +33,16 @@ class TrayWidget(QtWidgets.QSystemTrayIcon):
 
         self.menu = QtWidgets.QMenu()
 
-        self.sensors = MenuSensorsAction(self)
-        self.menu.addAction(self.sensors)
+        self.container = MenuContainerWidget()
+        self.container.pause.connect(self.pause.emit)
+        self.container.threshold.connect(self.threshold.emit)
+        self.container.backgroundLight.connect(self.backgroundLight.emit)
+        self.container.ambientLight.connect(self.ambientLight.emit)
+        self.container.quit.connect(self.quit.emit)
 
-        self.menu.addSeparator()
-
-        self.backlight = MenuBacklightAction(self)
-        self.sensors.ambientLight.connect(self.backlight.onActionAmbientLight)
-        self.sensors.ambientLight.connect(lambda x: self.ambientLight.emit(x))
-        self.sensors.ambientLight.connect(lambda x: self.backgroundLight.emit(x))
-        self.menu.addAction(self.backlight)
-
-        self.menu.addSeparator()
-
-        self.settings = MenuSettingsAction(self)
-        self.settings.threshold.connect(self.onActionThreshold)
-        self.settings.pause.connect(self.onActionPause)
-        self.menu.addAction(self.settings)
+        settings = QtWidgets.QWidgetAction(self)
+        settings.setDefaultWidget(self.container)
+        self.menu.addAction(settings)
         
         self.show()
 

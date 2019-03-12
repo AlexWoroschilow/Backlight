@@ -18,14 +18,15 @@ from PyQt5 import QtWidgets
 from .widget.threshold import ThresholdWidget
 
 
-class MenuSettingsAction(QtWidgets.QWidgetAction):
+class MenuSettingsAction(QtWidgets.QWidget):
 
     pause = QtCore.pyqtSignal(int)
     threshold = QtCore.pyqtSignal(int)
 
     @inject.params(config='config')
-    def __init__(self, parent, config):
-        super(MenuSettingsAction, self).__init__(parent)
+    def __init__(self, config=None):
+        if config is None: return None
+        super(MenuSettingsAction, self).__init__()
         
         layout = QtWidgets.QVBoxLayout()
 
@@ -38,9 +39,5 @@ class MenuSettingsAction(QtWidgets.QWidgetAction):
         self.toggle.stateChanged.connect(lambda x: self.pause.emit(x))
         layout.addWidget(self.toggle)
         
-        container = QtWidgets.QWidget()
-        container.setContentsMargins(0, 0, 0, 0)
-        container.setMinimumWidth(190)
-        container.setLayout(layout)
+        self.setLayout(layout)
         
-        self.setDefaultWidget(container)
