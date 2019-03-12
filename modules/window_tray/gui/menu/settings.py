@@ -36,7 +36,7 @@ class MenuSettingsAction(QtWidgets.QWidget):
 
         self.toggle = QtWidgets.QCheckBox('Enabled')
         self.toggle.setChecked(int(config.get('brightness.enabled')))
-        self.toggle.stateChanged.connect(lambda x: self.pause.emit(x))
+        self.toggle.stateChanged.connect(self.pause.emit)
         layout.addWidget(self.toggle)
         
         self.setLayout(layout)

@@ -38,8 +38,9 @@ class MenuContainerWidget(QtWidgets.QWidget):
         layout = QtWidgets.QGridLayout()
 
         self.settings = MenuSettingsAction()
-        self.settings.threshold.connect(self.onActionThreshold)
-        self.settings.pause.connect(self.onActionPause)
+        self.settings.pause.connect(self.toggleEvent)
+        self.settings.threshold.connect(self.thresholdEvent)
+        self.settings.pause.connect(self.pause.emit)
         layout.addWidget(self.settings, 0, 0)
 
         self.sensors = MenuSensorsAction()
@@ -48,21 +49,23 @@ class MenuContainerWidget(QtWidgets.QWidget):
         self.backlight = MenuBacklightAction()
         layout.addWidget(self.backlight, 0, 2)
         
-        self.sensors.ambientLight.connect(self.backlight.onActionAmbientLight)
-        self.sensors.ambientLight.connect(lambda x: self.ambientLight.emit(x))
-        self.sensors.ambientLight.connect(lambda x: self.backgroundLight.emit(x))
+        self.sensors.ambientLight.connect(self.backlight.update)
+        self.sensors.ambientLight.connect(self.backgroundLight.emit)
+        self.sensors.ambientLight.connect(self.ambientLight.emit)
 
         self.setLayout(layout)
 
     def onActionClick(self, value):
-        if value == self.Trigger:  # left click!
-            self.menu.exec_(QtGui.QCursor.pos())
+        if value != self.Trigger: return None
+        self.menu.exec_(QtGui.QCursor.pos())
 
     @inject.params(config='config')
-    def onActionPause(self, value=None, config=None):
+    def toggleEvent(self, value=None, config=None):
+        if value is None or config is None: return None
         config.set('brightness.enabled', '{}'.format(int(value)))
 
     @inject.params(config='config')
-    def onActionThreshold(self, value=None, config=None):
+    def thresholdEvent(self, value=None, config=None):
+        if value is None or config is None: return None
         config.set('brightness.threshold', '{}'.format(int(value)))
 

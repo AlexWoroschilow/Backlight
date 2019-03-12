@@ -18,9 +18,9 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt 
 
-from .widget.button import SensorsRadioButton
 from .widget.gauge import Gauge
 from .thread import TimeIntervalThread
+from .widget.button import RadioButton
 
 
 class MenuSensorsAction(QtWidgets.QGroupBox):
@@ -32,10 +32,8 @@ class MenuSensorsAction(QtWidgets.QGroupBox):
 
     @inject.params(config='config', sensors='sensors')
     def __init__(self, config=None, sensors=None):
-        if sensors is None: return None
-        if config is None: return None
         super(MenuSensorsAction, self).__init__()
-        self.setMinimumWidth(120)
+        if sensors is None or config is None: return None
         
         layout = QtWidgets.QVBoxLayout()
 
@@ -43,24 +41,23 @@ class MenuSensorsAction(QtWidgets.QGroupBox):
         self.label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.label)
 
-        self.gauge = Gauge(None, 120)
+        self.gauge = Gauge(120)
         self.ambientLight.connect(self.gauge.value)
         layout.addWidget(self.gauge)
 
         for device in sensors.devices:
             if device is None: continue
  
-            checkbox = SensorsRadioButton('{:>s}'.format(device.name))
+            checkbox = RadioButton(device.name)
             checkbox.setChecked(int(config.get('sensors.{}'.format(device.code))))
-            checkbox.ambientLight.connect(lambda x: self.ambientLight.emit(x))
+            
+            layout.addWidget(checkbox)
 
             action = functools.partial(self.toggle, checkbox=checkbox, device=device) 
             checkbox.toggled.connect(action)
             
             action = functools.partial(self.refresh, checkbox=checkbox, device=device) 
             self.thread.refresh.connect(action)
-            
-            layout.addWidget(checkbox)
 
         self.setLayout(layout)
 
@@ -68,36 +65,35 @@ class MenuSensorsAction(QtWidgets.QGroupBox):
 
     @inject.params(config='config')
     def toggle(self, state=None, config=None, checkbox=None, device=None):
-        if config is None: return None
-        if checkbox is None: return None
-        if device is None: return None
+        if config is None or checkbox is None or device is None: return None
 
         config.set('sensors.{}'.format(device.code), '{}'.format(int(state)))        
         self.refresh(None, checkbox=checkbox, device=device)
 
     @inject.params(config='config')
     def refresh(self, event=None, config=None, checkbox=None, device=None):
-        if config is None: return None
-        if checkbox is None: return None
-        if device is None: return None
+        if config is None or checkbox is None or device is None: return None
 
+        enabled = config.get('brightness.enabled')
+        threshold = config.get('brightness.threshold')
         # If the sensor was disabled do not request the values
         # this is important especially for the webcameras
         # because it is expensive to get and process the picturess
-        if not int(config.get('sensors.{}'.format(device.code))): 
-            return None
-
+        if not checkbox.isChecked(): return None
+        if not int(enabled): return None
+        
+        # cache the value in the variable to avoid 
+        # the new read of the device brightness value
         brightness = device.brightness
         # Do nothing if there are not brightness changes  
         if self.brightness == brightness: return None
 
-        threshold = math.fabs(self.brightness - brightness)
-        if threshold < int(config.get('brightness.threshold')):
-            return None
+        difference = math.fabs(self.brightness - brightness)
+        if difference < int(threshold): return None
 
-        if not int(config.get('brightness.enabled')): return None
         self.ambientLight.emit(brightness)
         self.brightness = brightness
 
     def quit(self):
+        if self.thread is None: return None
         self.thread.exit()

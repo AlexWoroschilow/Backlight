@@ -13,54 +13,57 @@
 import inject
 import functools
 
+from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt 
 
 from .widget.gauge import Gauge
 from .thread import TimeIntervalThread
+from .widget.button import RadioButton
 
 
 class MenuBacklightAction(QtWidgets.QGroupBox):
 
+    backLight = QtCore.pyqtSignal(int)
+
     thread = TimeIntervalThread() 
 
-    @inject.params(backlight='backlight')
-    def __init__(self, backlight=None):
-        if backlight is None: return None
+    @inject.params(config='config' , backlight='backlight')
+    def __init__(self, config=None, backlight=None):
         super(MenuBacklightAction, self).__init__()
-        self.setMinimumWidth(120)
+        if backlight is None or config is None: return None
         
-        layout = QtWidgets.QGridLayout()
-
-        collection = [device for device in backlight.devices]
-        if not len(collection): return None
+        layout = QtWidgets.QVBoxLayout()
 
         self.label = QtWidgets.QLabel('Backlight')
         self.label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.label, 0, 0, 1, len(collection))
+        layout.addWidget(self.label)
+
+        self.gauge = Gauge(120)
+        self.backLight.connect(self.gauge.value)
+        layout.addWidget(self.gauge)
         
-        for index, device in enumerate(collection):
+        for device in backlight.devices:
             if device is None: continue
-            gauge = Gauge(None, 100 if len(collection) > 1 else 120)
-            layout.addWidget(gauge, 1, index)
-            label = QtWidgets.QLabel(device.name)
-            label.setAlignment(Qt.AlignCenter)
-            layout.addWidget(label, 2, index)
             
-            action = functools.partial(self.refresh, chart=gauge, device=device) 
+            checkbox = RadioButton(device.name)
+            checkbox.setChecked(int(config.get('backlights.{}'.format(device.code))))
+            
+            layout.addWidget(checkbox)
+            
+            action = functools.partial(self.toggle, checkbox=checkbox, device=device) 
+            checkbox.toggled.connect(action)
+            
+            action = functools.partial(self.refresh, checkbox=checkbox, device=device) 
             self.thread.refresh.connect(action)
 
         self.setLayout(layout)
         
         self.thread.start()
 
-    def onActionPause(self, value):
-        self.pause = value
-
     @inject.params(backlights='backlight')
-    def onActionAmbientLight(self, value=None, backlights=None):
-        if backlights is None: return None
-        if value is None: return None
+    def update(self, value=None, backlights=None):
+        if backlights is None or value is None: return None
         for device in backlights.devices:
             if device is None: continue
             if value is not None and value < 5:
@@ -68,11 +71,17 @@ class MenuBacklightAction(QtWidgets.QGroupBox):
             if value is not None and value >= 5:
                 device.brightness = value
 
-    def refresh(self, event=None, chart=None, device=None):
-        if chart is None: return None
-        if device is None: return None
-        if event is None: return None
-        chart.value(device.brightness)
+    @inject.params(config='config')
+    def toggle(self, state=None, config=None, checkbox=None, device=None):
+        if config is None or checkbox is None or device is None: return None
+
+        config.set('backlights.{}'.format(device.code), '{}'.format(int(state)))        
+        self.refresh(None, checkbox=checkbox, device=device)
+
+    def refresh(self, event=None, checkbox=None, device=None):
+        if checkbox is None or device is None: return None
+        if not checkbox.isChecked(): return None
+        self.backLight.emit(device.brightness)
 
     def quit(self):
         self.thread.exit()

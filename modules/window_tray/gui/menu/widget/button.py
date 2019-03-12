@@ -14,9 +14,9 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 
-class SensorsRadioButton(QtWidgets.QRadioButton):
+class RadioButton(QtWidgets.QRadioButton):
     ambientLight = QtCore.pyqtSignal(int)
     
     def __init__(self, text=None):
-        super(SensorsRadioButton, self).__init__(text)
+        super(RadioButton, self).__init__(text)
     
