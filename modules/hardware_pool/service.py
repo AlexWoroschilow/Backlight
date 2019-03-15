@@ -18,23 +18,25 @@ class SensorPool(object):
     @property
     @inject.params(config='config', alsensors='al-sensors', webcameras='webcameras', backlight='backlight')
     def devices(self, config=None, alsensors=None, webcameras=None, backlight=None):
-        if alsensors is None or webcameras is None or backlight is None: return
-        
-        enabled = False 
-        
-        for index, device in enumerate(backlight.devices, start=0):
-            enabled = int(index == 0) if enabled is None else enabled  
-            if not config.has('backlights.{}'.format(device.code)):
-                config.set('backlights.{}'.format(device.code), enabled)
-        
-        for index, device in enumerate(alsensors.devices, start=0):
-            enabled = int(index == 0) if enabled is None else enabled  
-            if not config.has('sensors.{}'.format(device.code)):
-                config.set('sensors.{}'.format(device.code), enabled)
-            yield device
-            
-        for index, device in enumerate(webcameras.devices, start=0):
-            enabled = int(index == 0) if enabled is None else enabled  
-            if not config.has('sensors.{}'.format(device.code)):
-                config.set('sensors.{}'.format(device.code), enabled)
-            yield device
+
+        enabled = False
+
+        if backlight is not None:
+            for index, device in enumerate(backlight.devices, start=0):
+                enabled = int(index == 0) if enabled is None else enabled
+                if not config.has('backlights.{}'.format(device.code)):
+                    config.set('backlights.{}'.format(device.code), enabled)
+
+        if alsensors is not None:
+            for index, device in enumerate(alsensors.devices, start=0):
+                enabled = int(index == 0) if enabled is None else enabled
+                if not config.has('sensors.{}'.format(device.code)):
+                    config.set('sensors.{}'.format(device.code), enabled)
+                yield device
+
+        if webcameras is not None:
+            for index, device in enumerate(webcameras.devices, start=0):
+                enabled = int(index == 0) if enabled is None else enabled
+                if not config.has('sensors.{}'.format(device.code)):
+                    config.set('sensors.{}'.format(device.code), enabled)
+                yield device

@@ -27,7 +27,7 @@ class Loader(Loader):
         return False
 
     def config(self, binder=None):
-        binder.bind('icon', QtGui.QIcon("icons/icon.png"))
+        binder.bind('icon', QtGui.QIcon("icons/icon.svg"))
 
     @inject.params(window='window', icon='icon')
     def boot(self, options=None, args=None, window=None, icon=None):

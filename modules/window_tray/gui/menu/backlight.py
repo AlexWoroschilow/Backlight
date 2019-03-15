@@ -34,6 +34,7 @@ class MenuBacklightAction(QtWidgets.QGroupBox):
         if backlight is None or config is None: return None
         
         layout = QtWidgets.QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
 
         self.label = QtWidgets.QLabel('Backlight')
         self.label.setAlignment(Qt.AlignCenter)

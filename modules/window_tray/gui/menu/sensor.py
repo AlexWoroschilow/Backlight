@@ -16,7 +16,7 @@ import functools
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt 
+from PyQt5.QtCore import Qt
 
 from .widget.gauge import Gauge
 from .thread import TimeIntervalThread
@@ -24,18 +24,18 @@ from .widget.button import RadioButton
 
 
 class MenuSensorsAction(QtWidgets.QGroupBox):
-
     brightness = 0
     sensor = QtCore.pyqtSignal(bool, object)
     ambientLight = QtCore.pyqtSignal(int)
-    thread = TimeIntervalThread() 
+    thread = TimeIntervalThread()
 
     @inject.params(config='config', sensors='sensors')
     def __init__(self, config=None, sensors=None):
         super(MenuSensorsAction, self).__init__()
         if sensors is None or config is None: return None
-        
+
         layout = QtWidgets.QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
 
         self.label = QtWidgets.QLabel('Ambient light')
         self.label.setAlignment(Qt.AlignCenter)
@@ -47,16 +47,16 @@ class MenuSensorsAction(QtWidgets.QGroupBox):
 
         for device in sensors.devices:
             if device is None: continue
- 
+
             checkbox = RadioButton(device.name)
             checkbox.setChecked(int(config.get('sensors.{}'.format(device.code))))
-            
+
             layout.addWidget(checkbox)
 
-            action = functools.partial(self.toggle, checkbox=checkbox, device=device) 
+            action = functools.partial(self.toggle, checkbox=checkbox, device=device)
             checkbox.toggled.connect(action)
-            
-            action = functools.partial(self.refresh, checkbox=checkbox, device=device) 
+
+            action = functools.partial(self.refresh, checkbox=checkbox, device=device)
             self.thread.refresh.connect(action)
 
         self.setLayout(layout)
@@ -67,7 +67,7 @@ class MenuSensorsAction(QtWidgets.QGroupBox):
     def toggle(self, state=None, config=None, checkbox=None, device=None):
         if config is None or checkbox is None or device is None: return None
 
-        config.set('sensors.{}'.format(device.code), '{}'.format(int(state)))        
+        config.set('sensors.{}'.format(device.code), '{}'.format(int(state)))
         self.refresh(None, checkbox=checkbox, device=device)
 
     @inject.params(config='config')
@@ -81,7 +81,7 @@ class MenuSensorsAction(QtWidgets.QGroupBox):
         # because it is expensive to get and process the picturess
         if not checkbox.isChecked(): return None
         if not int(enabled): return None
-        
+
         # cache the value in the variable to avoid 
         # the new read of the device brightness value
         brightness = device.brightness
